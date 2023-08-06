@@ -1,7 +1,6 @@
 import random
 import string
 from flask import Flask, render_template, redirect, request
-#test push
 app = Flask(__name__)
 shortened_urls = {}
 
