@@ -20,14 +20,14 @@ def index():
         if not url:
             flash('the url is required!!')
             return redirect(url_for('index'))
-        url_data = conn.execute('INSERT INTO urls (original_url) VALUES (?)',(url,))
+        url_data = conn.execute('INSERT INTO urls (original_url) VALUES (?)',(url))
         conn.commit()
         conn.close()
 
         url_id = url_data.lastrowid
         hashid = hashids.encode(url_id)
         shorturl = request.host_url +hashid
-
-        return render_template('index.html',shorturl=shorturl)
+        
+        return render_template('index.html',shorturl=str(shorturl))
     return render_template('index.html')
 
