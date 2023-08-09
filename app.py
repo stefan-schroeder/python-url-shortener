@@ -8,8 +8,8 @@ def db_connection():
     return connection
 #create flask application object
 app = Flask(__name__)
-app.config['Key'] = "stefanisthebest"
-hashids = Hashids(min_length=4,salt=app.config['Key'])
+app.config['SECRET_KEY'] = "stefanisthebest"
+hashids = Hashids(min_length=4,salt=app.config['SECRET_KEY'])
 #flask view function, return value of index page gets converted into an html response thats sent using app route.
 #if request is get, skips the request form and sends user to index.html page.
 @app.route('/',methods = ("GET","POST"))
