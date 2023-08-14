@@ -35,3 +35,27 @@ def index():
         return render_template('index.html', short_url=short_url)
 
     return render_template('index.html')
+
+@app.route('/<id>')
+def redirect(id):
+        conn = db_connection()
+        #extract the original id using hashid
+        original_id= hashids.decode(id)
+
+        if original_id:
+            #gets the first value from the tuple
+            original_id= original_id[0]
+
+            url_data = conn.execute('SELECT originial_url, clicks FROM urls''WHERE id = (?)',(original_id,)).fetchone()
+
+            original_url=url_data['original_url']
+            clicks = url_data['clicks']
+
+            conn.execute('UPDATE urls SET clicks = ? WHERE id = ?',(clicks+1,original_id))
+
+            conn.commit()
+            conn.close()
+            return redirect(original_url)
+        else:
+             flash("That url is invalid!")
+             return redirect(url_for('index'))
