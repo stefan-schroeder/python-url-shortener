@@ -7,7 +7,7 @@ def db_connection():
     return connection
 #create flask application object
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'stringstring'
+app.config['SECRET_KEY'] = 's3crEtKey'
 hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 #flask view function, return value of index page gets converted into an html response thats sent using app route.
 #if request is get, skips the request form and sends user to index.html page.
@@ -37,16 +37,16 @@ def index():
     return render_template('index.html')
 
 @app.route('/<id>')
-def redirect(id):
+def url_redirect(id):
         conn = db_connection()
-        #extract the original id using hashid
+        #original id gets value if there is a hashid id
         original_id= hashids.decode(id)
 
         if original_id:
             #gets the first value from the tuple
             original_id= original_id[0]
 
-            url_data = conn.execute('SELECT originial_url, clicks FROM urls''WHERE id = (?)',(original_id,)).fetchone()
+            url_data = conn.execute('SELECT original_url, clicks FROM urls'' WHERE id = (?)',(original_id,)).fetchone()
 
             original_url=url_data['original_url']
             clicks = url_data['clicks']
@@ -57,5 +57,11 @@ def redirect(id):
             conn.close()
             return redirect(original_url)
         else:
-             flash("That url is invalid!")
-             return redirect(url_for('index'))
+            flash("That url is invalid!")
+            return redirect(url_for('index'))
+        
+@app.route('/stats')
+def stats():
+     conn = db_connection()
+
+     
