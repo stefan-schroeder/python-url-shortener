@@ -1,10 +1,7 @@
 import sqlite3
 from hashids import Hashids
 from flask import Flask, render_template, request, flash, redirect, url_for
-def db_connection():
-    connection = sqlite3.connect("database.db")
-    connection.row_factory = sqlite3.Row
-    return connection
+
 #create flask application object
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 's3crEtKey'
@@ -14,7 +11,8 @@ hashids = Hashids(min_length=4, salt=app.config['SECRET_KEY'])
 
 @app.route('/', methods=('GET', 'POST'))
 def index():
-    conn = db_connection()
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
 
     if request.method == 'POST':
         url = request.form['url']
@@ -38,13 +36,14 @@ def index():
 
 @app.route('/<id>')
 def url_redirect(id):
-        conn = db_connection()
+        conn = sqlite3.connect("database.db")
+        conn.row_factory = sqlite3.Row
         #original id gets value if there is a hashid id
-        original_id= hashids.decode(id)
-
+        original_id = hashids.decode(id)
+        #Basically checks to see if hashids decoded the id, if it did then redirect, else return invalid 
         if original_id:
             #gets the first value from the tuple
-            original_id= original_id[0]
+            original_id = original_id[0]
 
             url_data = conn.execute('SELECT original_url, clicks FROM urls'' WHERE id = (?)',(original_id,)).fetchone()
 
